@@ -110,6 +110,40 @@ jobs:
           path: dist
           destination: dist
 
+  dist-upload:
+    docker:
+      - image: python:3.7.2
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip install --upgrade setuptools wheel
+            pip install -r requirements_release.txt
+
+      - run:
+          name: make dist
+          command: |
+            . venv/bin/activate
+            make dist
+
+      - store_artifacts:
+          path: dist
+          destination: dist
+
+      - run:
+          name: upload-release
+          command: |
+            . venv/bin/activate
+            python -m twine upload --username "$PYPI_USERNAME" --password "$PYPI_PASSWORD" 'dist/*'
+
 workflows:
   version: 2
   ci:
@@ -117,3 +151,14 @@ workflows:
       - test-py37
       - test-py36
       - dist
+          filters:
+            branches:
+              ignore:
+                - master
+      - dist-upload
+          requires:
+            - test-py37
+          filters:
+            branches:
+              only:
+                - master

@@ -96,6 +96,18 @@ Check code coverage of tests::
     make test-coverage
     make test-coverage-report-console
 
+Maintainers
+-----------
+
+CircleCI config
++++++++++++++++
+
+Set env vars:
+
+* ``PYPI_USERNAME``
+* ``PYPI_PASSWORD``
+
+
 Credits
 -------
 
